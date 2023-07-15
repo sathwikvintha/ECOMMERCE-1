@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
+import * as crypto from "crypto";
 
 var userSchema = new mongoose.Schema(
   {

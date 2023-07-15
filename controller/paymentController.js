@@ -4,8 +4,8 @@ const Razorpay = require("razorpay");
 
 const instance = new Razorpay({
   /**These key you can generate them in your razorpay account */
-  key_id: "rzp_test_0zdEWhxgcWvm4B",
-  key_secret: "8dT269YwIe4dLDwVLtIeaRvJ",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET,
 });
 
 const checkout = async (req, res) => {
