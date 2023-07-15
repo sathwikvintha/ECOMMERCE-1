@@ -1,15 +1,15 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   createUser,
-  loginUserControl,
-  getallUser,
-  getaUser,
-  deleteaUser,
-  updatedUser,
+  getAllUsers,
+  loginUserCtrl,
+  getUserById,
+  deleteUser,
+  updateUser,
   blockUser,
   unblockUser,
   handleRefreshToken,
-  logout,
+  logOut,
   updatePassword,
   forgotPasswordToken,
   resetPassword,
@@ -18,66 +18,81 @@ const {
   saveAddress,
   userCart,
   getUserCart,
-  emptyCart,
-  applyCoupon,
+  //emptyCart,
+  //applyCoupon,
   createOrder,
-  getOrders,
-  updateOrderStatus,
-  getAllOrders,
+  // updateOrderStatus,
   removeProductFromCart,
   updateProductQuantityFromCart,
-} = require("../controller/userControl");
-const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
-// import { checkout, paymentVerification } from "../controller/paymentController";
-const {
-  checkout,
-  paymentVerification,
-} = require("../controller/paymentController");
-const router = express.Router();
-router.post("/register", createUser);
-router.post("/forgot-password-token", forgotPasswordToken);
+  getMyOrders,
+  getAllOrders,
+  emptyCart,
+  getMonthWiseOrderIncome,
+  getYearlyTotalOrders,
+  getSingleOrder,
+  updateOrder,
+} from "../controllers/userCtrl.js";
+import { authMiddleware, isAdmin } from "../middlewares/authMiddleware.js";
+import { checkout, paymentVerification } from "../controllers/paymentCtrl.js";
 
-router.put("/reset-password/:token", resetPassword);
+// Create an express authRouter
+const authRouter = express.Router();
 
-router.put("/password", authMiddleware, updatePassword);
-router.post("/login", loginUserControl);
-router.post("/admin-login", loginAdmin);
-router.post("/cart", authMiddleware, userCart);
-router.post("/order/checkout", authMiddleware, checkout);
-router.post("/order/paymentVerification", authMiddleware, paymentVerification);
-// router.post("/cart/applycoupon", authMiddleware, applyCoupon);
-router.post("/cart/create-order", authMiddleware, createOrder);
-router.get("/all-users", getallUser);
-// router.get("/get-orders", authMiddleware, getOrders);
-// router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
-// router.post("/getorderbyuser/:id", authMiddleware, isAdmin, getAllOrders);
-router.get("/refresh", handleRefreshToken);
-router.get("/logout", logout);
-router.get("/wishlist", authMiddleware, getWishlist);
-router.get("/cart", authMiddleware, getUserCart);
+authRouter.post("/register", createUser);
+authRouter.post("/forgot-password-token", forgotPasswordToken);
+authRouter.put("/reset-password/:token", resetPassword);
+//authRouter.put('/order/update-order/:id', authMiddleware, isAdmin, updateOrderStatus);
+authRouter.put(
+  "/password",
+  authMiddleware,
+  updatePassword
+); /**We need  authMiddleware to get the user by req.user then get the user _id */
+authRouter.post("/login", loginUserCtrl);
+authRouter.post("/admin-login", loginAdmin);
+authRouter.post("/cart", authMiddleware, userCart);
+authRouter.post("/order/checkout", authMiddleware, checkout);
+authRouter.post(
+  "/order/paymentVerification",
+  authMiddleware,
+  paymentVerification
+);
+//authRouter.post('/cart/applycoupon', authMiddleware, applyCoupon);
+authRouter.post("/cart/create-order", authMiddleware, createOrder);
+//authRouter.post('/order/cash-order', authMiddleware, createOrder);
+authRouter.get("/all-users", getAllUsers);
+authRouter.get("/getmyorders", authMiddleware, getMyOrders);
+authRouter.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
+authRouter.get("/getaOrder/:id", authMiddleware, isAdmin, getSingleOrder);
+authRouter.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
+//authRouter.post('/getorderbyuser/:id', authMiddleware, isAdmin, getAllOrders);
+authRouter.get("/refresh", handleRefreshToken);
+authRouter.get("/logout", logOut);
+authRouter.get("/wishlist", authMiddleware, getWishlist);
+authRouter.get("/cart", authMiddleware, getUserCart);
+authRouter.get(
+  "/getMonthWiseOrderIncome",
+  authMiddleware,
+  getMonthWiseOrderIncome
+);
+authRouter.get("/getYearlyTotalOrders", authMiddleware, getYearlyTotalOrders);
 
-router.get("/:id", authMiddleware, isAdmin, getaUser);
-router.delete(
+authRouter.get("/:id", authMiddleware, isAdmin, getUserById); // Only an admin can access to a User infos
+//authRouter.delete('/empty-cart', authMiddleware, emptyCart);
+authRouter.delete(
   "/delete-product-cart/:cartItemId",
   authMiddleware,
   removeProductFromCart
 );
-router.delete(
+authRouter.delete(
   "/update-product-cart/:cartItemId/:newQuantity",
   authMiddleware,
   updateProductQuantityFromCart
 );
-// router.delete("/empty-cart", authMiddleware, emptyCart);
-router.delete("/:id", deleteaUser);
-// router.put(
-//   "/order/update-order/:id",
-//   authMiddleware,
-//   isAdmin,
-//   updateOrderStatus
-// );
-router.put("/edit-user", authMiddleware, updatedUser);
-router.put("/save-address", authMiddleware, saveAddress);
-router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
-router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);
+authRouter.delete("/empty-cart", authMiddleware, emptyCart);
+authRouter.delete("/:id", authMiddleware, isAdmin, deleteUser);
+authRouter.put("/edit-user", authMiddleware, updateUser);
+authRouter.put("/save-address", authMiddleware, saveAddress);
+authRouter.put("/block-user/:id", authMiddleware, isAdmin, blockUser); // Only an admin can block users
+authRouter.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser); // Only an admin can unblock users
 
-module.exports = router;
+export default authRouter;
