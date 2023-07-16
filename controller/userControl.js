@@ -1,22 +1,18 @@
-import { generateToken } from "../config/jwtToken.js";
-import User from "../models/userModel.js";
-import asyncHandler from "express-async-handler"; /**Simple middleware for handling exceptions inside of async express 
-routes and passing them to your express error handlers. */
-import { validateMongoDbId } from "../utils/validateMongodbid.js";
-import { generateRefreshToken } from "../config/refreshToken.js";
-import jwt from "jsonwebtoken";
-import { sendEmail } from "./emailCtrl.js";
-import crypto from "crypto";
-import Product from "./../models/productModel.js";
-import Cart from "./../models/cartModel.js";
-import Coupon from "./../models/couponModel.js";
-import Order from "./../models/orderModel.js";
-import uniqid from "uniqid"; /**A Unique Hexadecimal ID generator.
-It will always create unique id's based on the 
-current time, process and machine name. */
+const { generateToken } = require("../config/jwtToken.js");
+const user = require("../models/userModel.js");
+const asyncHandler = require("express-async-handler");
+const validateMongoDbId = require("../utils/validateMongodbid.js");
+const { generateRefreshToken } = require("../config/refreshToken.js");
+const jwt = require("jsonwebtoken");
+const sendEmail = require("./emailController.js");
+const crypto = require("crypto");
+const Product = require("./../models/productModel.js");
+const Cart = require("./../models/cartModel.js");
+const Coupon = require("./../models/couponModel.js");
+const order = require("./../models/orderModel.js");
+const uniqid = require("uniqid");
 
-//Create a User
-export const createUser = asyncHandler(async (req, res) => {
+const createUser = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const findUser = await User.findOne({ email: email });
   if (!findUser) {
@@ -34,7 +30,7 @@ export const createUser = asyncHandler(async (req, res) => {
 });
 
 // Login a User
-export const loginUserCtrl = asyncHandler(async (req, res) => {
+const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findUser = await User.findOne({ email: email });
@@ -78,7 +74,7 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
 });
 
 // admin login
-export const loginAdmin = asyncHandler(async (req, res) => {
+const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findAdmin = await User.findOne({ email: email });
@@ -121,7 +117,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 });
 
 // Handle refresh token
-export const handleRefreshToken = asyncHandler(async (req, res) => {
+const handleRefreshToken = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
   //console.log(cookie);
   if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
@@ -142,7 +138,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
 });
 
 // Log out functionality
-export const logOut = asyncHandler(async (req, res) => {
+const logOut = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
   if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
   const refreshToken = cookie.refreshToken;
@@ -165,7 +161,7 @@ export const logOut = asyncHandler(async (req, res) => {
 });
 
 // Update a user
-export const updateUser = asyncHandler(async (req, res) => {
+const updateUser = asyncHandler(async (req, res) => {
   //const { id } = req.params;
   // We can get the user with his infos in the req object
   const { _id } = req.user;
@@ -195,7 +191,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 });
 
 // Save User Address
-export const saveAddress = asyncHandler(async (req, res) => {
+const saveAddress = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
@@ -218,7 +214,7 @@ export const saveAddress = asyncHandler(async (req, res) => {
 });
 
 // Get all users
-export const getAllUsers = asyncHandler(async (req, res) => {
+const getAllUsers = asyncHandler(async (req, res) => {
   try {
     const getUsers = await User.find();
     res.status(200).json(getUsers);
@@ -228,7 +224,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 // Get a single User
-export const getUserById = asyncHandler(async (req, res) => {
+const getUserById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -240,7 +236,7 @@ export const getUserById = asyncHandler(async (req, res) => {
 });
 
 // DELETE a User
-export const deleteUser = asyncHandler(async (req, res) => {
+const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -255,7 +251,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 });
 
 // Block a User
-export const blockUser = asyncHandler(async (req, res) => {
+const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -277,7 +273,7 @@ export const blockUser = asyncHandler(async (req, res) => {
 });
 
 // Unblock a User
-export const unblockUser = asyncHandler(async (req, res) => {
+const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -298,7 +294,7 @@ export const unblockUser = asyncHandler(async (req, res) => {
   }
 });
 
-export const updatePassword = asyncHandler(async (req, res) => {
+const updatePassword = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   console.log(req.user);
   const { password } = req.body;
@@ -314,7 +310,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
-export const forgotPasswordToken = asyncHandler(async (req, res) => {
+const forgotPasswordToken = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found with this email");
@@ -337,7 +333,7 @@ export const forgotPasswordToken = asyncHandler(async (req, res) => {
   }
 });
 
-export const resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   const { password } = req.body;
   const { token } = req.params;
 
@@ -360,7 +356,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
-export const getWishlist = asyncHandler(async (req, res) => {
+const getWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   try {
     const findUser = await User.findById(_id).populate("wishlist");
@@ -370,7 +366,7 @@ export const getWishlist = asyncHandler(async (req, res) => {
   }
 });
 
-export const userCart = asyncHandler(async (req, res) => {
+const userCart = asyncHandler(async (req, res) => {
   const { productId, color, quantity, price } = req.body;
   const { _id } = req.user;
   validateMongoDbId(_id);
@@ -388,7 +384,7 @@ export const userCart = asyncHandler(async (req, res) => {
   }
 });
 
-export const getUserCart = asyncHandler(async (req, res) => {
+const getUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
@@ -404,7 +400,7 @@ export const getUserCart = asyncHandler(async (req, res) => {
   }
 });
 
-export const removeProductFromCart = asyncHandler(async (req, res) => {
+const removeProductFromCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { cartItemId } = req.params;
   validateMongoDbId(_id);
@@ -419,7 +415,7 @@ export const removeProductFromCart = asyncHandler(async (req, res) => {
   }
 });
 
-export const emptyCart = asyncHandler(async (req, res) => {
+const emptyCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
@@ -432,7 +428,7 @@ export const emptyCart = asyncHandler(async (req, res) => {
   }
 });
 
-export const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
+const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { cartItemId, newQuantity } = req.params;
   validateMongoDbId(_id);
@@ -449,7 +445,7 @@ export const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   }
 });
 
-export const applyCoupon = asyncHandler(async (req, res) => {
+const applyCoupon = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   const { coupon } = req.body;
@@ -475,7 +471,7 @@ export const applyCoupon = asyncHandler(async (req, res) => {
   res.json(totalAfterDiscount);
 });
 
-export const createOrder = asyncHandler(async (req, res) => {
+const createOrder = asyncHandler(async (req, res) => {
   const {
     shippingInfo,
     orderItems,
@@ -502,7 +498,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   }
 });
 
-export const getMyOrders = asyncHandler(async (req, res) => {
+const getMyOrders = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
@@ -518,7 +514,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   }
 });
 
-export const getAllOrders = asyncHandler(async (req, res) => {
+const getAllOrders = asyncHandler(async (req, res) => {
   try {
     const allOrders = await Order.find().populate("user");
     res.json(allOrders);
@@ -526,7 +522,7 @@ export const getAllOrders = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-export const getSingleOrder = asyncHandler(async (req, res) => {
+const getSingleOrder = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const orders = await Order.findOne({ _id: id })
@@ -537,7 +533,7 @@ export const getSingleOrder = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-export const updateOrder = asyncHandler(async (req, res) => {
+const updateOrder = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const orders = await Order.findById(id);
@@ -548,7 +544,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-export const getOrderByUserId = asyncHandler(async (req, res) => {
+const getOrderByUserId = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -562,7 +558,7 @@ export const getOrderByUserId = asyncHandler(async (req, res) => {
   }
 });
 
-export const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
+const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
   let monthNames = [
     "January",
     "February",
@@ -606,7 +602,7 @@ export const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
   res.json(data);
 });
 
-export const getYearlyTotalOrders = asyncHandler(async (req, res) => {
+const getYearlyTotalOrders = asyncHandler(async (req, res) => {
   let monthNames = [
     "January",
     "February",
@@ -647,3 +643,36 @@ export const getYearlyTotalOrders = asyncHandler(async (req, res) => {
   ]);
   res.json(data);
 });
+
+module.exports = {
+  createUser,
+  loginUserCtrl,
+  logOut,
+  updateUser,
+  getAllUsers,
+  blockUser,
+  unblockUser,
+  handleRefreshToken,
+  updatePassword,
+  forgotPasswordToken,
+  resetPassword,
+  loginAdmin,
+  getWishlist,
+  saveAddress,
+  userCart,
+  getUserCart,
+  emptyCart,
+  applyCoupon,
+  createOrder,
+  getAllOrders,
+  getOrderByUserId,
+  getYearlyTotalOrders,
+  getMonthWiseOrderIncome,
+  updateOrder,
+  getSingleOrder,
+  getMyOrders,
+  updateProductQuantityFromCart,
+  removeProductFromCart,
+  deleteUser,
+  getUserById,
+};

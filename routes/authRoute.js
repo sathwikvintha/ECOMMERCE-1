@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createUser,
   getAllUsers,
   loginUserCtrl,
@@ -31,9 +31,12 @@ import {
   getYearlyTotalOrders,
   getSingleOrder,
   updateOrder,
-} from "../controllers/userCtrl.js";
-import { authMiddleware, isAdmin } from "../middlewares/authMiddleware.js";
-import { checkout, paymentVerification } from "../controllers/paymentCtrl.js";
+} = require("../controller/userControl");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const {
+  checkout,
+  paymentVerification,
+} = require("../controller/paymentController");
 
 // Create an express authRouter
 const authRouter = express.Router();
@@ -95,4 +98,4 @@ authRouter.put("/save-address", authMiddleware, saveAddress);
 authRouter.put("/block-user/:id", authMiddleware, isAdmin, blockUser); // Only an admin can block users
 authRouter.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser); // Only an admin can unblock users
 
-export default authRouter;
+module.exports = authRouter;
