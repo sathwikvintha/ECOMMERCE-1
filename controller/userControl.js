@@ -11,7 +11,7 @@ const Cart = require("./../models/cartModel.js");
 const Coupon = require("./../models/couponModel.js");
 const order = require("./../models/orderModel.js");
 const uniqid = require("uniqid");
-const BASE_URL = process.env.BASE_URL;
+// const BASE_URL = process.env.BASE_URL;
 
 const createUser = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -320,8 +320,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     await user.save();
     const resetURL = `Hi, Please follow this link to reset your password. 
         This link is valid 10 minutes from now. 
-        <a href='${BASE_URL}/reset-password/${token}'>
-        Click Here</a>`;
+        <a href='$http://localhost:5000/reset-password/${token}'>Click Here</a>`;
     const data = {
       to: email,
       text: "Hey User",
